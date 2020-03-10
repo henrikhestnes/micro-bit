@@ -1,7 +1,11 @@
 #include "uart.h"
+#include "gpio.h"
 #include <stdint.h>
 
 #define UART ((NRF_UART_REG*)0x40002000)
+#define __BUTTON_A_PIN__ 17
+#define __BUTTON_B_PIN__ 26
+
 
 typedef struct {
 	volatile uint32_t STARTRX;
@@ -44,8 +48,33 @@ typedef struct {
 } NRF_UART_REG;
 
 
-void uart_init();
+void uart_init(){
+	// Configure LED Matrix
+	for(int i = 4; i <= 15; i++){
+		GPIO->DIRSET = (1 << i);
+		GPIO->OUTCLR = (1 << i);
+	}
 
-void uart_send(char letter);
+	// Configure buttons
+	GPIO->PIN_CNF[__BUTTON_A_PIN__] = 0;
+	GPIO->PIN_CNF[__BUTTON_B_PIN__] = 0;
 
-char uart_read();
+    UART->PSELTXD = 24;
+    UART->PSELRXD = 25;
+
+    UART->PSELCTS = 0xFFFFFFFF;
+    UART->PSELRTS = 0xFFFFFFFF;
+
+    UART->BAUDRATE = 0x00275000;
+
+    UART->ENABLE = 4;
+    UART->STARTRX = 1;
+}
+
+void uart_send(char letter){
+
+}
+
+char uart_read(){
+
+}
